@@ -1,6 +1,8 @@
 import React, { useReducer, useEffect } from "react";
 import TetrisBlock from "./TetrisBlock";
-import { TETROMINOS, randomTetromino } from "../utils/tetrominos";
+import { randomTetromino } from "../utils/tetrominos";
+import Score from "./Score";
+import styles from "./GameBoard.module.scss";
 
 // Initialer Zustand des Spiels
 const initialState = {
@@ -9,6 +11,8 @@ const initialState = {
   position: { x: 3, y: 0 },
   gameOver: false,
   fullRows: [],
+  score: 0,
+  level: 1,
 };
 
 // Funktion zur Rotation eines Tetrominos
@@ -210,6 +214,8 @@ const GameBoard = () => {
     gameOver,
     fullRows,
     animationStage,
+    score,
+    level,
   } = state;
   const [blinkingRows, setBlinkingRows] = React.useState([]);
 
@@ -287,14 +293,18 @@ const GameBoard = () => {
   };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(10, 32px)` }}>
-      {gameOver ? (
-        <div>GAME OVER</div>
-      ) : (
-        renderBoard()
-          .flat()
-          .map((color, index) => <TetrisBlock key={index} color={color} />)
-      )}
+    <div className={styles["game-container"]}>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(10, 32px)` }}>
+        {gameOver ? (
+          <div>GAME OVER</div>
+        ) : (
+          renderBoard()
+            .flat()
+            .map((color, index) => <TetrisBlock key={index} color={color} />)
+        )}
+      </div>
+      <Score level={level} score={score} />{" "}
+      {/* Füge die Score-Komponente hinzu */}
     </div>
   );
 };
