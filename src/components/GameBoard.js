@@ -346,6 +346,7 @@ const GameBoard = () => {
               <TetrisBlock key={index} color={color} />
             ))}
         </div>
+        <div className={styles.werbung}>Hier könnte Ihre Werbung stehen 😅</div>
         {gameOver && (
           <div className={styles["game-over"]}>
             GAME OVER
