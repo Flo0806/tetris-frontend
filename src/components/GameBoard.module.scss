@@ -1,4 +1,12 @@
 .game-container {
   display: flex;
   align-items: flex-start;
+  padding: 1rem;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid darkgray;
+  box-shadow: 5px 5px 8px #8f664a85;
+  background-color: gray;
+  max-width: 720px;
+  margin: 1rem;
 }

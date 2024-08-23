@@ -13,6 +13,8 @@ const initialState = {
   fullRows: [],
   score: 0,
   level: 1,
+  totalRowsCleared: 0,
+  totalPoints: 0,
 };
 
 // Funktion zur Rotation eines Tetrominos
@@ -159,20 +161,50 @@ const reducer = (state, action) => {
       };
 
     case "CLEAR_ROWS":
-      // Entferne die vollständigen Reihen nach der Animation
       const clearedBoard = state.board.filter(
         (_, rowIndex) => !state.fullRows.includes(rowIndex)
       );
       const emptyRows = Array(state.fullRows.length).fill(Array(10).fill(0));
+      const newBoard = [...emptyRows, ...clearedBoard];
 
-      // Nach dem Entfernen der Reihen wird ein neues Tetromino generiert
+      // Berechne die Punkte basierend auf der Anzahl der entfernten Reihen
+      const rowsCleared = state.fullRows.length;
+      let points = 0;
+      switch (rowsCleared) {
+        case 1:
+          points = 100 * state.level;
+          break;
+        case 2:
+          points = 300 * state.level;
+          break;
+        case 3:
+          points = 500 * state.level;
+          break;
+        case 4:
+          points = 800 * state.level;
+          break;
+        default:
+          points = 0;
+      }
+
+      // Addiere die Punkte
+      const totalPoints = state.score + points;
+
+      // Aktualisiere die Anzahl der Reihen, die insgesamt entfernt wurden
+      const totalRowsCleared = state.totalRowsCleared + rowsCleared;
+
+      // Prüfe, ob ein Levelaufstieg erfolgt (z.B. nach 10 entfernten Reihen)
+      const newLevel = Math.floor(totalRowsCleared / 10) + 1; // Alle 10 Reihen steigt das Level
+
+      // Füge das neue Tetromino hinzu
       const nextTetromino = randomTetromino();
       const nextPosition = { x: 3, y: 0 };
 
+      // Prüfe, ob das Spiel vorbei ist
       if (
         checkCollision(
           {
-            board: [...emptyRows, ...clearedBoard],
+            board: newBoard,
             position: nextPosition,
             currentTetromino: nextTetromino,
           },
@@ -180,19 +212,18 @@ const reducer = (state, action) => {
           0
         )
       ) {
-        return {
-          ...state,
-          board: [...emptyRows, ...clearedBoard],
-          gameOver: true,
-        };
+        return { ...state, board: newBoard, gameOver: true };
       }
 
       return {
         ...state,
-        board: [...emptyRows, ...clearedBoard],
+        board: newBoard,
         currentTetromino: nextTetromino,
         position: nextPosition,
         fullRows: [],
+        score: totalPoints,
+        level: newLevel,
+        totalRowsCleared: totalRowsCleared,
         animationStage: "none",
       };
 
@@ -238,12 +269,13 @@ const GameBoard = () => {
 
   useEffect(() => {
     if (!gameOver) {
+      const speed = 1000 - (state.level - 1) * 100; // Das Intervall verkürzt sich mit jedem Level
       const interval = setInterval(() => {
         dispatch({ type: "DROP" });
-      }, 1000);
+      }, Math.max(speed, 100)); // Maximalgeschwindigkeit: 100ms Intervall
       return () => clearInterval(interval);
     }
-  }, [gameOver]);
+  }, [gameOver, state.level]);
 
   useEffect(() => {
     if (animationStage === "checking_rows") {
