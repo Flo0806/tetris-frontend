@@ -8,6 +8,7 @@ const initialState = {
   currentTetromino: randomTetromino(),
   position: { x: 3, y: 0 },
   gameOver: false,
+  fullRows: [],
 };
 
 // Funktion zur Rotation eines Tetrominos
@@ -22,8 +23,11 @@ const checkCollision = (
   state,
   moveX,
   moveY,
-  shape = state.currentTetromino.shape
+  shape = state.currentTetromino?.shape
 ) => {
+  // Stelle sicher, dass shape definiert ist
+  if (!shape) return false;
+
   const { board, position } = state;
 
   for (let y = 0; y < shape.length; y++) {
@@ -32,12 +36,12 @@ const checkCollision = (
         const newY = position.y + y + moveY;
         const newX = position.x + x + moveX;
 
-        // Verhindere Kollision mit Spielfeldrändern oder fixierten Blöcken
+        // Überprüfe auf Kollision mit dem Spielfeld oder fixierten Blöcken
         if (
-          newY >= 20 || // Unterer Rand
-          newX < 0 || // Linker Rand
-          newX >= 10 || // Rechter Rand
-          (newY >= 0 && board[newY][newX] !== 0) // Kollision mit fixierten Blöcken
+          newY >= 20 || // Unten
+          newX < 0 || // Links
+          newX >= 10 || // Rechts
+          (newY >= 0 && board[newY][newX] !== 0) // Fixierte Blöcke
         ) {
           return true;
         }
@@ -59,17 +63,6 @@ const fixTetromino = (state) => {
     });
   });
   return newBoard;
-};
-
-const checkForFullRows = (board) => {
-  const newBoard = board.filter((row) => row.some((cell) => cell === 0)); // Behalte nur unvollständige Reihen
-  const fullRowsCount = 20 - newBoard.length; // Anzahl der vollständigen Reihen
-
-  // Füge leere Reihen oben hinzu, damit das Spielfeld die gleiche Größe behält
-  const emptyRows = Array.from({ length: fullRowsCount }, () =>
-    Array(10).fill(0)
-  );
-  return [...emptyRows, ...newBoard];
 };
 
 // Reducer-Funktion für das Spiel
@@ -105,44 +98,99 @@ const reducer = (state, action) => {
 
     case "DROP":
       if (!checkCollision(state, 0, 1)) {
-        // Der Stein kann weiter fallen
         return {
           ...state,
           position: { ...state.position, y: state.position.y + 1 },
         };
       } else {
-        // Kollision erkannt -> Tetromino fixieren und neues generieren
+        // Fixiere das Tetromino und entferne es aus dem Zustand
         const newBoard = fixTetromino(state);
-
-        // Check for full rows
-        const clearedBoard = checkForFullRows(newBoard);
-
-        const newTetromino = randomTetromino();
-        const newPosition = { x: 3, y: 0 };
-
-        // Prüfen, ob das neue Tetromino sofort blockiert ist -> Game Over
-        if (
-          checkCollision(
-            {
-              board: clearedBoard,
-              position: newPosition,
-              currentTetromino: newTetromino,
-            },
-            0,
-            0
-          )
-        ) {
-          return { ...state, board: clearedBoard, newBoard, gameOver: true };
-        }
-
-        // Neues Tetromino korrekt einsetzen
         return {
           ...state,
-          board: clearedBoard,
-          currentTetromino: newTetromino,
-          position: newPosition,
+          board: newBoard,
+          currentTetromino: null, // Tetromino leeren
+          animationStage: "checking_rows",
         };
       }
+
+    case "CHECK_ROWS":
+      // Überprüfen auf vollständige Reihen
+      const fullRows = state.board.reduce(
+        (acc, row, rowIndex) =>
+          row.every((cell) => cell !== 0) ? [...acc, rowIndex] : acc,
+        []
+      );
+
+      if (fullRows.length > 0) {
+        return {
+          ...state,
+          fullRows,
+          animationStage: "blinking",
+        };
+      }
+
+      // Wenn keine Reihen zu entfernen sind, generiere ein neues Tetromino
+      const newTetromino = randomTetromino();
+      const newPosition = { x: 3, y: 0 };
+
+      if (
+        checkCollision(
+          {
+            board: state.board,
+            position: newPosition,
+            currentTetromino: newTetromino,
+          },
+          0,
+          0
+        )
+      ) {
+        return { ...state, gameOver: true };
+      }
+
+      return {
+        ...state,
+        currentTetromino: newTetromino,
+        position: newPosition,
+        animationStage: "none",
+      };
+
+    case "CLEAR_ROWS":
+      // Entferne die vollständigen Reihen nach der Animation
+      const clearedBoard = state.board.filter(
+        (_, rowIndex) => !state.fullRows.includes(rowIndex)
+      );
+      const emptyRows = Array(state.fullRows.length).fill(Array(10).fill(0));
+
+      // Nach dem Entfernen der Reihen wird ein neues Tetromino generiert
+      const nextTetromino = randomTetromino();
+      const nextPosition = { x: 3, y: 0 };
+
+      if (
+        checkCollision(
+          {
+            board: [...emptyRows, ...clearedBoard],
+            position: nextPosition,
+            currentTetromino: nextTetromino,
+          },
+          0,
+          0
+        )
+      ) {
+        return {
+          ...state,
+          board: [...emptyRows, ...clearedBoard],
+          gameOver: true,
+        };
+      }
+
+      return {
+        ...state,
+        board: [...emptyRows, ...clearedBoard],
+        currentTetromino: nextTetromino,
+        position: nextPosition,
+        fullRows: [],
+        animationStage: "none",
+      };
 
     case "RESET":
       return initialState;
@@ -155,7 +203,15 @@ const reducer = (state, action) => {
 // Hauptkomponente für das Spielbrett
 const GameBoard = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { board, currentTetromino, position, gameOver } = state;
+  const {
+    board,
+    currentTetromino,
+    position,
+    gameOver,
+    fullRows,
+    animationStage,
+  } = state;
+  const [blinkingRows, setBlinkingRows] = React.useState([]);
 
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -183,39 +239,63 @@ const GameBoard = () => {
     }
   }, [gameOver]);
 
+  useEffect(() => {
+    if (animationStage === "checking_rows") {
+      // Starte die Überprüfung auf vollständige Reihen
+      dispatch({ type: "CHECK_ROWS" });
+    }
+  }, [animationStage]);
+
+  useEffect(() => {
+    if (animationStage === "blinking" && fullRows.length > 0) {
+      // Starte die Blinkanimation
+      setBlinkingRows(fullRows);
+      setTimeout(() => {
+        setBlinkingRows([]);
+        dispatch({ type: "CLEAR_ROWS" });
+      }, 500); // Blinkzeit 500ms
+    }
+  }, [animationStage, fullRows]);
+
   const renderBoard = () => {
-    // Kopiere das Board
-    const tempBoard = board.map((row) => [...row]);
-
-    // Füge das aktuelle Tetromino zum temporären Board hinzu
-    currentTetromino.shape.forEach((row, y) => {
-      row.forEach((value, x) => {
-        if (value !== 0) {
-          const boardY = position.y + y;
-          const boardX = position.x + x;
-
-          // Stelle sicher, dass wir nur in den Bereich des Boards schreiben
-          if (boardY >= 0 && boardY < 20 && boardX >= 0 && boardX < 10) {
-            tempBoard[boardY][boardX] = currentTetromino.color;
-          }
+    const tempBoard = board.map((row, rowIndex) =>
+      row.map((cell, colIndex) => {
+        if (blinkingRows.includes(rowIndex)) {
+          return "white"; // Blinke die volle Reihe in Weiß
         }
+        return cell;
+      })
+    );
+
+    // Zeichne das aktuelle Tetromino, wenn es vorhanden ist
+    if (currentTetromino) {
+      currentTetromino.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value !== 0) {
+            const boardY = position.y + y;
+            const boardX = position.x + x;
+
+            if (boardY >= 0 && boardY < 20 && boardX >= 0 && boardX < 10) {
+              tempBoard[boardY][boardX] = currentTetromino.color;
+            }
+          }
+        });
       });
-    });
+    }
 
     return tempBoard;
   };
 
   return (
-    <React.Fragment>
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(10, 32px)` }}>
-        {renderBoard()
+    <div style={{ display: "grid", gridTemplateColumns: `repeat(10, 32px)` }}>
+      {gameOver ? (
+        <div>GAME OVER</div>
+      ) : (
+        renderBoard()
           .flat()
-          .map((color, index) => (
-            <TetrisBlock key={index} color={color} />
-          ))}
-      </div>
-      {state.gameOver && <div>GAME OVER</div>}
-    </React.Fragment>
+          .map((color, index) => <TetrisBlock key={index} color={color} />)
+      )}
+    </div>
   );
 };
 
