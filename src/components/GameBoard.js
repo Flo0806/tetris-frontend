@@ -3,6 +3,7 @@ import TetrisBlock from "./TetrisBlock";
 import { randomTetromino } from "../utils/tetrominos";
 import Score from "./Score";
 import styles from "./GameBoard.module.scss";
+import ScoreOverview from "./ScoreOverview";
 
 // Initialer Zustand des Spiels
 const initialState = {
@@ -326,7 +327,7 @@ const GameBoard = () => {
 
   return (
     <div className={styles["game-container"]}>
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(10, 32px)` }}>
+      <div className={styles["tetris-grid"]}>
         {gameOver ? (
           <div>GAME OVER</div>
         ) : (
@@ -335,7 +336,9 @@ const GameBoard = () => {
             .map((color, index) => <TetrisBlock key={index} color={color} />)
         )}
       </div>
-      <Score level={level} score={score} />{" "}
+      <div>
+        <Score level={level} score={score} /> <ScoreOverview></ScoreOverview>
+      </div>
       {/* Füge die Score-Komponente hinzu */}
     </div>
   );
