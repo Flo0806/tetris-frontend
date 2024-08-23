@@ -9,4 +9,16 @@
   background-color: gray;
   max-width: 720px;
   margin: 1rem;
+  gap: 15px;
+  justify-content: center;
+}
+
+.tetris-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 32px);
+  grid-template-rows: repeat(20, 32px);
+  padding: 0;
+  margin: 0;
+  gap: 0;
+  border: none;
 }

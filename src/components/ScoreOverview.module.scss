@@ -1,0 +1,79 @@
+.score-overview {
+  margin: 20px auto;
+  padding: 20px;
+  width: 275px;
+  max-width: 600px;
+  background-color: #f7f7f7;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+
+  h2 {
+    font-family: "Arial", sans-serif;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    margin-top: 0;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    padding: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: "Arial", sans-serif;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    /* Verlaufeffekt */
+    background: linear-gradient(90deg, #ff6347 0%, #ffa07a 100%);
+
+    &:nth-child(2) {
+      background: linear-gradient(90deg, #ff7f50 0%, #ffb07a 100%);
+    }
+
+    &:nth-child(3) {
+      background: linear-gradient(90deg, #ff8c66 0%, #ffc07a 100%);
+    }
+
+    &:nth-child(4) {
+      background: linear-gradient(90deg, #ffa07a 0%, #ffd07a 100%);
+    }
+
+    &:nth-child(5) {
+      background: linear-gradient(90deg, #ffb07a 0%, #ffe07a 100%);
+    }
+
+    &:nth-child(6) {
+      background: linear-gradient(90deg, #ffc07a 0%, #fff07a 100%);
+    }
+
+    &:nth-child(7) {
+      background: linear-gradient(90deg, #ffd07a 0%, #ffff7a 100%);
+    }
+
+    &:nth-child(8) {
+      background: linear-gradient(90deg, #ffe07a 0%, #ffffa7 100%);
+    }
+
+    &:nth-child(9) {
+      background: linear-gradient(90deg, #fff07a 0%, #ffffc7 100%);
+    }
+
+    &:nth-child(10) {
+      background: linear-gradient(90deg, #ffff7a 0%, #ffffe7 100%);
+    }
+  }
+}
