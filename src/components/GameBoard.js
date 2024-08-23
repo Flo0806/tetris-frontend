@@ -327,14 +327,15 @@ const GameBoard = () => {
 
   return (
     <div className={styles["game-container"]}>
-      <div className={styles["tetris-grid"]}>
-        {gameOver ? (
-          <div>GAME OVER</div>
-        ) : (
-          renderBoard()
+      <div style={{ position: "relative" }}>
+        <div className={styles["tetris-grid"]}>
+          {renderBoard()
             .flat()
-            .map((color, index) => <TetrisBlock key={index} color={color} />)
-        )}
+            .map((color, index) => (
+              <TetrisBlock key={index} color={color} />
+            ))}
+        </div>
+        {gameOver && <div className={styles["game-over"]}>GAME OVER</div>}
       </div>
       <div>
         <Score level={level} score={score} /> <ScoreOverview></ScoreOverview>
