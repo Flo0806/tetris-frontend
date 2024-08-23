@@ -3,20 +3,21 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./ScoreOverview.module.scss";
 
-const ScoreOverview = () => {
+const ScoreOverview = ({ shouldUpdate }) => {
   const [scores, setScores] = useState([]);
 
   useEffect(() => {
+    if (!shouldUpdate) return;
+
     axios
       .get("http://localhost:8080/api/scores/scores")
       .then((response) => {
-        console.log(response.data);
         setScores(response.data);
       })
       .catch((error) => {
         console.error("Es gab ein Problem beim Abrufen der Scores:", error);
       });
-  }, []);
+  }, [shouldUpdate]);
 
   return (
     <div className={styles["score-overview"]}>

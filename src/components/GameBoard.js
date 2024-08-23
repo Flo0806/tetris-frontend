@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useState } from "react";
+import React, { useReducer, useEffect, useState, useCallback } from "react";
 import TetrisBlock from "./TetrisBlock";
 import { randomTetromino } from "../utils/tetrominos";
 import Score from "./Score";
@@ -240,6 +240,8 @@ const reducer = (state, action) => {
 // Hauptkomponente für das Spielbrett
 const GameBoard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [hasNewScore, setHasNewScore] = useState(false);
+
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
     board,
@@ -298,8 +300,16 @@ const GameBoard = () => {
     }
   }, [animationStage, fullRows]);
 
+  const openScoreClicked = useCallback(() => {
+    if (!isModalOpen) {
+      setHasNewScore(false);
+      setIsModalOpen(true);
+    }
+  }, [isModalOpen]);
+
   const closeModal = () => {
     setIsModalOpen(false);
+    setHasNewScore(true);
     resetGame();
   };
 
@@ -350,18 +360,13 @@ const GameBoard = () => {
         {gameOver && (
           <div className={styles["game-over"]}>
             GAME OVER
-            <button
-              onClick={() => {
-                setIsModalOpen(true);
-              }}
-            >
-              SCORE
-            </button>
+            <button onClick={openScoreClicked}>SCORE</button>
           </div>
         )}
       </div>
       <div>
-        <Score level={level} score={score} /> <ScoreOverview></ScoreOverview>
+        <Score level={level} score={score} />{" "}
+        <ScoreOverview shouldUpdate={hasNewScore}></ScoreOverview>
       </div>
       <Modal show={isModalOpen} onClose={closeModal} score={score} />
     </div>
