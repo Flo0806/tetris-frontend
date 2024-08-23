@@ -26,6 +26,7 @@ const TetrisBlock = ({ color }) => {
 
   return (
     <div
+      role="presentation" // Hinzugefügt für bessere Testbarkeit
       style={{
         width: "32px",
         height: "32px",
