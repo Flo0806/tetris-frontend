@@ -1,9 +1,10 @@
-import React, { useReducer, useEffect } from "react";
+import React, { useReducer, useEffect, useState } from "react";
 import TetrisBlock from "./TetrisBlock";
 import { randomTetromino } from "../utils/tetrominos";
 import Score from "./Score";
 import styles from "./GameBoard.module.scss";
 import ScoreOverview from "./ScoreOverview";
+import Modal from "./Modal";
 
 // Initialer Zustand des Spiels
 const initialState = {
@@ -238,6 +239,7 @@ const reducer = (state, action) => {
 
 // Hauptkomponente für das Spielbrett
 const GameBoard = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
     board,
@@ -296,6 +298,15 @@ const GameBoard = () => {
     }
   }, [animationStage, fullRows]);
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    resetGame();
+  };
+
+  const resetGame = () => {
+    dispatch({ type: "RESET" }); // Setze das Spiel zurück
+  };
+
   const renderBoard = () => {
     const tempBoard = board.map((row, rowIndex) =>
       row.map((cell, colIndex) => {
@@ -335,12 +346,23 @@ const GameBoard = () => {
               <TetrisBlock key={index} color={color} />
             ))}
         </div>
-        {gameOver && <div className={styles["game-over"]}>GAME OVER</div>}
+        {gameOver && (
+          <div className={styles["game-over"]}>
+            GAME OVER
+            <button
+              onClick={() => {
+                setIsModalOpen(true);
+              }}
+            >
+              SCORE
+            </button>
+          </div>
+        )}
       </div>
       <div>
         <Score level={level} score={score} /> <ScoreOverview></ScoreOverview>
       </div>
-      {/* Füge die Score-Komponente hinzu */}
+      <Modal show={isModalOpen} onClose={closeModal} score={score} />
     </div>
   );
 };
