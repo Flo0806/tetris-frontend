@@ -1,0 +1,15 @@
+// src/components/TetrisBlock.scss
+
+$tetris-block-size: 32px;
+
+.tetris-block {
+  background-size: cover;
+  width: $tetris-block-size;
+  height: $tetris-block-size;
+  display: inline-block;
+
+  // Beispiel für eine SCSS-Verschachtelung
+  &:hover {
+    opacity: 0.8;
+  }
+}
