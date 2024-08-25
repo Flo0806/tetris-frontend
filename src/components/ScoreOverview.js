@@ -8,6 +8,17 @@ const ScoreOverview = ({ shouldUpdate }) => {
   const [scores, setScores] = useState([]);
 
   useEffect(() => {
+    axios
+      .get(apiUrl + "/scores/scores")
+      .then((response) => {
+        setScores(response.data);
+      })
+      .catch((error) => {
+        console.error("Es gab ein Problem beim Abrufen der Scores:", error);
+      });
+  }, []);
+
+  useEffect(() => {
     if (!shouldUpdate) return;
 
     axios
