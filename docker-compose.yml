@@ -1,15 +1,17 @@
 version: "3"
 services:
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     ports:
       - "3339:80"
     networks:
       - frontend-network
+    volumes:
+      - .:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
     restart: always
 
 networks:
   frontend-network:
-    driver: bridge

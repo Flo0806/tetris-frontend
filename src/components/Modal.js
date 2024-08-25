@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./Modal.module.scss";
 import axios from "axios";
+const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
 const Modal = ({ show, onClose, score }) => {
   const [playerName, setPlayerName] = useState("");
@@ -9,7 +10,7 @@ const Modal = ({ show, onClose, score }) => {
     if (playerName.trim() === "") return;
 
     try {
-      await axios.post("http://localhost:8080/api/scores", {
+      await axios.post(apiUrl + "/scores", {
         playerName,
         score,
         level: 1, // Du kannst das Level dynamisch anpassen, falls nötig
