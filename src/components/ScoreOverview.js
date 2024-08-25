@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./ScoreOverview.module.scss";
+const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
 const ScoreOverview = ({ shouldUpdate }) => {
   const [scores, setScores] = useState([]);
@@ -10,7 +11,7 @@ const ScoreOverview = ({ shouldUpdate }) => {
     if (!shouldUpdate) return;
 
     axios
-      .get("http://localhost:8080/api/scores/scores")
+      .get(apiUrl + "/scores/scores")
       .then((response) => {
         setScores(response.data);
       })
