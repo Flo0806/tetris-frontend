@@ -1,4 +1,3 @@
-// src/components/ScoreOverview.js
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./ScoreOverview.module.scss";

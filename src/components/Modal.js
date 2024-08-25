@@ -13,7 +13,7 @@ const Modal = ({ show, onClose, score }) => {
       await axios.post(apiUrl + "/scores", {
         playerName,
         score,
-        level: 1, // Du kannst das Level dynamisch anpassen, falls nötig
+        level: 1,
       });
       onClose();
     } catch (error) {

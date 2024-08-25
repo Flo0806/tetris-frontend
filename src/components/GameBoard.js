@@ -314,20 +314,20 @@ const GameBoard = () => {
   };
 
   const resetGame = () => {
-    dispatch({ type: "RESET" }); // Setze das Spiel zurück
+    dispatch({ type: "RESET" }); // Reset the game
   };
 
   const renderBoard = () => {
     const tempBoard = board.map((row, rowIndex) =>
       row.map((cell, colIndex) => {
         if (blinkingRows.includes(rowIndex)) {
-          return "white"; // Blinke die volle Reihe in Weiß
+          return "white"; // Blink animation if line is complete
         }
         return cell;
       })
     );
 
-    // Zeichne das aktuelle Tetromino, wenn es vorhanden ist
+    // Draw the actual tetromino
     if (currentTetromino) {
       currentTetromino.shape.forEach((row, y) => {
         row.forEach((value, x) => {

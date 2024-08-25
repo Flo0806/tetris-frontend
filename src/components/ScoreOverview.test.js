@@ -1,11 +1,9 @@
-// src/components/ScoreOverview.test.js
-
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
 import ScoreOverview from "./ScoreOverview";
 
-// Mock für axios
+// Mock for axios
 jest.mock("axios");
 
 describe("ScoreOverview", () => {
@@ -19,20 +17,20 @@ describe("ScoreOverview", () => {
   });
 
   it("should fetch and display top 10 scores when shouldUpdate is true", async () => {
-    // Simulierte Daten, die von der API zurückgegeben werden
+    // Simulated data returned by the API
     const mockedScores = [
       { playerName: "John", score: 100 },
       { playerName: "Doe", score: 90 },
       { playerName: "Alice", score: 85 },
     ];
 
-    // Definiere, wie axios.get reagiert
+    // Define how axios.get should behave
     axios.get.mockResolvedValue({ data: mockedScores });
 
-    // Rendere die Komponente mit shouldUpdate = true
+    // Render the component with shouldUpdate = true
     render(<ScoreOverview shouldUpdate={true} />);
 
-    // Warte, bis die Daten in die UI geladen werden
+    // Wait until the data is loaded into the UI
     await waitFor(() => {
       expect(screen.getByText("John")).toBeInTheDocument();
       expect(screen.getByText("100")).toBeInTheDocument();
@@ -42,7 +40,7 @@ describe("ScoreOverview", () => {
       expect(screen.getByText("85")).toBeInTheDocument();
     });
 
-    // Überprüfe, ob axios.get aufgerufen wurde
+    // Check that axios.get was called
     expect(axios.get).toHaveBeenCalledTimes(1);
     expect(axios.get).toHaveBeenCalledWith(
       "http://localhost:8080/api/scores/scores"
@@ -50,25 +48,25 @@ describe("ScoreOverview", () => {
   });
 
   it("should log an error if the API call fails", async () => {
-    // Simulierte Fehlermeldung
+    // Simulated error message
     const mockedError = new Error("Network error");
-    console.error = jest.fn(); // Mock für console.error
+    console.error = jest.fn(); // Mock for console.error
 
-    // Simuliere einen fehlschlagenden API-Aufruf
+    // Simulate a failed API call
     axios.get.mockRejectedValue(mockedError);
 
-    // Rendere die Komponente mit shouldUpdate = true
+    // Render the component with shouldUpdate = true
     render(<ScoreOverview shouldUpdate={true} />);
 
-    // Warte, bis der Fehler behandelt wurde
+    // Wait until the error is handled
     await waitFor(() => {
       expect(console.error).toHaveBeenCalledWith(
-        "Es gab ein Problem beim Abrufen der Scores:",
+        "There was a problem fetching the scores:",
         mockedError
       );
     });
 
-    // Überprüfe, ob axios.get aufgerufen wurde
+    // Check that axios.get was called
     expect(axios.get).toHaveBeenCalledTimes(1);
   });
 });

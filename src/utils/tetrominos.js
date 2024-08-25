@@ -1,7 +1,5 @@
-// src/tetrominos.js
-
 export const TETROMINOS = {
-  0: { shape: [[0]], color: "0" }, // Leeres Block-Array
+  0: { shape: [[0]], color: "0" }, // Empty block array
   I: {
     shape: [
       [0, "I", 0, 0],

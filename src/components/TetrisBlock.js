@@ -20,13 +20,13 @@ const blockImages = {
 };
 
 const TetrisBlock = ({ color }) => {
-  const backgroundColor = color === 0 ? "#d3d3d3" : "#d3d3d3"; // Setze leere Zellen auf hellgrau
+  const backgroundColor = color === 0 ? "#d3d3d3" : "#d3d3d3"; // Empty cells are grey
 
-  const backgroundImage = color !== 0 ? `url(${blockImages[color]})` : "none"; // Verwende das Bild, wenn color nicht 0 ist
+  const backgroundImage = color !== 0 ? `url(${blockImages[color]})` : "none"; // Use picture for a tetromino
 
   return (
     <div
-      role="presentation" // Hinzugefügt für bessere Testbarkeit
+      role="presentation"
       style={{
         width: "32px",
         height: "32px",
@@ -36,8 +36,8 @@ const TetrisBlock = ({ color }) => {
             ? "1px solid #ccc"
             : "0px solid #00000000",
         backgroundImage: backgroundImage,
-        backgroundSize: "cover", // Skaliert das Bild, um den gesamten Block zu füllen
-        backgroundPosition: "center", // Zentriert das Bild
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     ></div>
   );
